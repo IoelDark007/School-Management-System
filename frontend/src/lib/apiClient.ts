@@ -5,15 +5,28 @@ interface ApiResponse<T> {
   data: T;
 }
 
-export async function apiRequest<T>(url: string): Promise<T | null> {
-  const response = await fetch(url);
-  const result: ApiResponse<T> = await response.json();
+export async function apiRequest<T>(endpoint: string, options?: RequestInit) {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
+  
+  const response = await fetch(`${baseUrl}${endpoint}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options?.headers,
+    },
+  });
 
-  if (result.responseCode === 0) {
-    return result.data; // Success path 
-  } else {
-    // Handle error codes 1-8 as defined in the standard [cite: 24, 62]
-    console.error(`Error ${result.responseCode}: ${result.responseMessage}`);
-    return null;
+  const result = await response.json();
+
+  // Rule: Standardized response must have responseCode
+  if (result.responseCode !== 0) {
+    // If there's an error (Codes 1-8), we throw it to be caught by the UI
+    throw {
+      code: result.responseCode,
+      message: result.responseMessage,
+      data: result.data
+    };
   }
+
+  return result; // Returns { responseCode, responseMessage, data, dataCount }
 }
