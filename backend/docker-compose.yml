@@ -1,9 +1,33 @@
+# docker-compose.yml for School Management System
 services:
-  api:
-    build: .
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: edumanager-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:8000/api
+    depends_on:
+      - backend
+    networks:
+      - edumanager-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile 
+    container_name: edumanager-backend
     ports:
       - "8000:8000"
     volumes:
-      - .:/app
-    env_file: .env
-    command: python manage.py runserver 0.0.0.0:8000
+      - ./backend:/app
+    environment:
+      - DEBUG=1
+    networks:
+      - edumanager-network
+
+networks:
+  edumanager-network:
+    driver: bridge
