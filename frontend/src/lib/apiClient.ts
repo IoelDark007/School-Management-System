@@ -1,32 +1,26 @@
 // frontend/src/lib/api-client.ts
-interface ApiResponse<T> {
-  responseCode: number;
-  responseMessage: string;
-  data: T;
-}
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1";
 
-export async function apiRequest<T>(endpoint: string, options?: RequestInit) {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
-  
-  const response = await fetch(`${baseUrl}${endpoint}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
-  });
+export async function apiRequest(endpoint: string, options: RequestInit = {}) {
+  // In a real app, retrieve this from a cookie or secure storage
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
+  const headers = {
+    "Content-Type": "application/json",
+    ...(token && { "Authorization": `Bearer ${token}` }),
+    ...options.headers,
+  };
+
+  const response = await fetch(`${BASE_URL}${endpoint}`, { ...options, headers });
   const result = await response.json();
 
-  // Rule: Standardized response must have responseCode
-  if (result.responseCode !== 0) {
-    // If there's an error (Codes 1-8), we throw it to be caught by the UI
+  // Handle DRF Standard Errors vs Your Custom Standard
+  if (!response.ok) {
     throw {
-      code: result.responseCode,
-      message: result.responseMessage,
-      data: result.data
+      code: response.status,
+      message: result.detail || result.message || "An error occurred",
     };
   }
 
-  return result; // Returns { responseCode, responseMessage, data, dataCount }
+  return result;
 }
