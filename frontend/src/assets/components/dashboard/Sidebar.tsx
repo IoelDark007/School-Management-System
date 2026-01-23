@@ -14,7 +14,7 @@ export function Sidebar() {
   const menuItems = [
     { icon: <LayoutDashboard size={20} />, label: "Dashboard", href: "/dashboard" },
     { icon: <GraduationCap size={20} />, label: "Students", href: "/students" },
-    { icon: <Users size={20} />, label: "Staff", href: "/teachers" },
+    { icon: <Users size={20} />, label: "Staff", href: "/teachers&staff" },
     { icon: <School size={20} />, label: "Classes", href: "/classes" },
     { icon: <Landmark size={20} />, label: "Finance", href: "/finance" },
     { icon: <Calendar size={20} />, label: "Attendance", href: "/attendance" },

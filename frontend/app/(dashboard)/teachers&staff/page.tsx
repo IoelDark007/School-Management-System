@@ -6,6 +6,7 @@ import { apiRequest } from "@/src/lib/apiClient";
 import { StaffTable, StaffMember } from "@/src/assets/components/management/StaffTable";
 import { AddStaffModal } from "@/src/assets/components/management/AddStaff";
 import { Pagination } from "@/src/assets/components/management/Pagination";
+import { StaffFilters } from "@/src/assets/components/management/StaffFilters";
 
 interface PaginatedResponse {
   count: number;
@@ -22,8 +23,29 @@ export default function StaffDirectoryPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [filters, setFilters] = useState({
+    role: "",
+    dept: "",
+    status: "",
+  });
 
-  const resultsPerPage = 10;
+  const resultsPerPage = 5;
+
+  const handleFilterChange = (newFilters: any) => {
+    setFilters((prev) => ({ ...prev, ...newFilters }));
+    setCurrentPage(1); // Reset to first page on filter change
+  };
+
+  // Logic to reset everything
+  const handleClearAll = () => {
+    setSearchTerm("");
+    setFilters({
+      role: "",
+      dept: "",
+      status: ""
+    });
+    setCurrentPage(1);
+  };
 
   // Fetch Logic
   const fetchStaff = async (page: number, search: string) => {
@@ -32,6 +54,9 @@ export default function StaffDirectoryPage() {
       const query = new URLSearchParams({
         page: page.toString(),
         search: search,
+        role: filters.role,
+        department: filters.dept,
+        status: filters.status,
       });
 
       const data: PaginatedResponse = await apiRequest(`/staff/?${query}`, {
@@ -66,8 +91,7 @@ export default function StaffDirectoryPage() {
     }, 300); // Debounce search to prevent too many API calls
 
     return () => clearTimeout(delayDebounceFn);
-  }, [currentPage, searchTerm]);
-
+  }, [currentPage, searchTerm, filters]);
   const totalPages = Math.ceil(totalResults / resultsPerPage);
 
   return (
@@ -107,12 +131,11 @@ export default function StaffDirectoryPage() {
             className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:ring-2 focus:ring-slate-100 transition-all text-sm"
           />
         </div>
-        <div className="flex items-center gap-2">
-          {loading && <Loader2 className="animate-spin text-slate-400" size={18} />}
-          <button className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-slate-500 hover:bg-slate-50 rounded-lg border">
-            <SlidersHorizontal size={16} /> Filters
-          </button>
-        </div>
+        <StaffFilters 
+          filters={filters}
+          onFilterChange={handleFilterChange}
+          onClear={handleClearAll}
+        />
       </div>
 
       {/* 3. Table & Pagination Container */}
