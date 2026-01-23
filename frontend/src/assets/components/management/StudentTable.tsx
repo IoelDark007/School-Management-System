@@ -1,6 +1,6 @@
 // frontend/src/assets/components/management/StudentTable.tsx
 import Link from "next/dist/client/link";
-import { Student } from "../../types/api";
+import { Student } from "../../../types/api";
 
 export function StudentTable({ students }: { students: Student[] }) {
   return (
@@ -21,7 +21,7 @@ export function StudentTable({ students }: { students: Student[] }) {
             <tr key={student.id} className="hover:bg-slate-50/50 transition-colors">
               <td className="px-6 py-4 font-bold text-cyan-600">{student.id}</td>
               <td className="px-6 py-4">
-                    <Link 
+                <Link
                   href={`/students/${student.id}`}
                   className="flex items-center gap-3 hover:text-cyan-600 transition-colors"
                 >

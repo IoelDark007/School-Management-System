@@ -5,7 +5,7 @@ import { Plus, Search, Filter, Download } from "lucide-react";
 import { apiRequest } from "@/src/lib/apiClient";
 import { StudentTable } from "@/src/assets/components/management/StudentTable";
 import { AddStudentModal } from "@/src/assets/components/management/AddStudentModal";
-import { Student } from "@/src/assets/types/api";
+import { Student } from "@/src/types/api";
 import { FilterBar } from "@/src/assets/components/management/FilterBar";
 
 export default function StudentsManagementPage() {
@@ -16,17 +16,17 @@ export default function StudentsManagementPage() {
   const fetchStudents = async () => {
     try {
       const data = await apiRequest("/students/", { method: "GET" });
-      
+
       const formattedData = data.map((s: any) => ({
-        id: s.user_id || s.id, 
+        id: s.user_id || s.id,
         fullName: `${s.first_name} ${s.last_name}`,
         email: s.email || "N/A",
         grade: s.grade || "Unassigned",
         enrollmentDate: s.created_at ? new Date(s.created_at).toLocaleDateString() : "N/A",
-        status: s.status.charAt(0).toUpperCase() + s.status.slice(1), 
+        status: s.status.charAt(0).toUpperCase() + s.status.slice(1),
         profileImage: s.profile_image || `https://ui-avatars.com/api/?name=${s.first_name}+${s.last_name}&background=random`,
       }));
-      
+
       setStudents(formattedData);
     } catch (err) {
       console.error("Failed to load students:", err);
@@ -37,7 +37,7 @@ export default function StudentsManagementPage() {
     fetchStudents();
   }, []);
 
-  const filteredStudents = students.filter(s => 
+  const filteredStudents = students.filter(s =>
     s.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     s.id.toString().toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -53,8 +53,8 @@ export default function StudentsManagementPage() {
       <div className="bg-white border-x border-t rounded-t-2xl p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
         <div className="relative w-full md:w-96">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-          <input 
-            type="text" 
+          <input
+            type="text"
             placeholder="Search by name or ID..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -70,12 +70,12 @@ export default function StudentsManagementPage() {
       <StudentTable students={filteredStudents} />
 
       {/* Your Modal Component */}
-      <AddStudentModal 
-        isOpen={isModalOpen} 
+      <AddStudentModal
+        isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
           fetchStudents(); // Refresh data after adding
-        }} 
+        }}
       />
     </div>
   );
