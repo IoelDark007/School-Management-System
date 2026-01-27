@@ -14,25 +14,27 @@ export default function StudentsManagementPage() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const fetchStudents = async () => {
-    try {
-      const data = await apiRequest("/students/", { method: "GET" });
-      
-      // Mapping backend data to match the StudentTable prop expectations
-      const formattedData = data.map((s: any) => ({
-        id: s.user_id || s.id, // Using the manual user_id as the ID in the table
-        fullName: `${s.first_name} ${s.last_name}`,
-        email: s.email || "N/A",
-        grade: s.grade || "Unassigned",
-        enrollmentDate: s.created_at ? new Date(s.created_at).toLocaleDateString() : "N/A",
-        status: s.status.charAt(0).toUpperCase() + s.status.slice(1), // Capitalize (active -> Active)
-        profileImage: s.profile_image || `https://ui-avatars.com/api/?name=${s.first_name}+${s.last_name}&background=random`,
-      }));
-      
-      setStudents(formattedData);
-    } catch (err) {
-      console.error("Failed to load students:", err);
-    }
-  };
+  try {
+    const data = await apiRequest("/students/", { method: "GET" });
+    
+    // DRF returns data in a .results array if paginated, otherwise it's just data
+    const studentList = Array.isArray(data) ? data : data.results || [];
+    
+    const formattedData = studentList.map((s: any) => ({
+      id: s.student_id || s.id, // Backend field name is often student_id
+      fullName: `${s.first_name} ${s.last_name}`,
+      email: s.email || "N/A",
+      grade: s.current_class_name || s.grade || "Unassigned", // Check your exact backend field
+      enrollmentDate: s.enrollment_date || (s.created_at ? new Date(s.created_at).toLocaleDateString() : "N/A"),
+      status: s.status ? s.status.charAt(0).toUpperCase() + s.status.slice(1) : "Active",
+      profileImage: s.profile_image || `https://ui-avatars.com/api/?name=${s.first_name}+${s.last_name}&background=random`,
+    }));
+    
+    setStudents(formattedData);
+  } catch (err) {
+    console.error("Failed to load students:", err);
+  }
+};
 
   useEffect(() => {
     fetchStudents();

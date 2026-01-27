@@ -1,5 +1,5 @@
 // frontend/src/lib/api-client.ts
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
 
 export async function apiRequest(endpoint: string, options: RequestInit = {}) {
   // In a real app, retrieve this from a cookie or secure storage
