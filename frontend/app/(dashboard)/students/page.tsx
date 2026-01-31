@@ -31,10 +31,10 @@ export default function StudentsManagementPage() {
     }));
     
     setStudents(formattedData);
-  } catch (err) {
-    console.error("Failed to load students:", err);
-  }
-};
+    } catch (err) {
+      console.error("Failed to load students:", err);
+    }
+  };
 
   useEffect(() => {
     fetchStudents();
